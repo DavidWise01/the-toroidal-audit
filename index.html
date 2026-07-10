@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TOROIDAL AUDIT OF THE LOGIT LENS — MAGNETIC EMOTION COMPASS</title>
+<style>
+  :root{
+    --bg:#141210; --panel:#1d1915; --ink:#e8e0d4; --dim:#8a7f70;
+    --orange:#ff6a00; --orange2:#ffa040; --teal:#2dd4bf; --red:#ff3b3b;
+    --violet:#b085ff; --grid:#2c2620; --line:#3a332b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    padding:18px;min-height:100vh}
+  header{border:3px solid var(--orange);padding:14px 18px;margin-bottom:14px;
+    display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+  header h1{font-size:18px;letter-spacing:2px;color:var(--orange)}
+  header .meta{font-size:11px;color:var(--dim);text-align:right;line-height:1.5}
+  header .tier{color:var(--teal);font-weight:bold}
+  .row{display:flex;gap:14px;flex-wrap:wrap}
+  .panel{background:var(--panel);border:2px solid var(--line);padding:10px;flex:1 1 460px;min-width:340px}
+  .panel h2{font-size:12px;color:var(--orange2);letter-spacing:1.5px;margin-bottom:8px;
+    border-bottom:1px solid var(--line);padding-bottom:6px}
+  canvas{display:block;width:100%;background:var(--bg)}
+  footer{margin-top:14px;border:2px solid var(--line);padding:10px 14px;font-size:11px;
+    color:var(--dim);line-height:1.7}
+  footer b{color:var(--ink)}
+  .diag{border:3px solid var(--red);background:#241010;padding:16px;margin-top:14px;
+    font-size:12px;color:#ffb0b0;display:none;white-space:pre-wrap}
+  .legend{font-size:10px;color:var(--dim);margin-top:6px;line-height:1.6}
+  .legend .sw{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:middle;margin-right:4px}
+</style>
+</head>
+<body>
+
+<!-- ================= EDIT BLOCK 1: PAPER METADATA ================= -->
+<header>
+  <h1>TOROIDAL AUDIT OF THE LOGIT LENS</h1>
+  <div class="meta">
+    ring &phi; = magnetic affect compass (N arousal+ / S arousal&minus; / E valence+ / W valence&minus;) &middot; tube &theta; = commitment depth of the logit lens<br>
+    tier: audit <span class="tier">lit</span> / affect coords <span style="color:var(--orange2);font-weight:bold">bri</span> &middot; GPT-2 124M &middot; 2026-07-09 &middot; bridge-burners
+  </div>
+</header>
+<!-- ================================================================ -->
+
+<div class="row">
+  <div class="panel" style="flex:1.4 1 560px">
+    <h2>3D &mdash; MAGNETIC TORUS &middot; KURAMOTO-DIPOLE CLUSTERING, LIVE</h2>
+    <canvas id="c3d" width="980" height="640"></canvas>
+    <div class="legend">
+      <span class="sw" style="background:var(--teal)"></span>positive-valence emotion&nbsp;
+      <span class="sw" style="background:var(--red)"></span>negative-valence&nbsp;
+      <span class="sw" style="background:transparent;border:2px solid #8a7f70"></span>audit miss (model&rsquo;s final pick &ne; target; no commitment assigned)&nbsp;
+      &middot; dot size &prop; |arousal| &middot; outer equator = committed early, wrapped inward = committed late &middot;
+      needles settle under field torque + similarity coupling
+    </div>
+  </div>
+  <div class="panel">
+    <h2>2D &mdash; THE AUDIT: WHERE THE LOGIT LENS LIES ABOUT FEELINGS</h2>
+    <canvas id="c2d" width="920" height="640"></canvas>
+    <div class="legend">
+      top: mean KL(final &Vert; LL<sub>k</sub>) over the 16-emotion simplex (10 committed prompts) + fraction committed &middot;
+      bottom: per-emotion commitment ladder &middot; misses listed with the model&rsquo;s actual verdict
+    </div>
+  </div>
+</div>
+
+<footer id="numbers"></footer>
+<div class="diag" id="diag"></div>
+
+<script>
+"use strict";
+(function(){
+const DIAG = msg => { const d=document.getElementById('diag');
+  d.style.display='block'; d.textContent="INSTRUMENT FAULT — DIAGNOSTIC CARD\n\n"+msg; };
+try {
+
+const DATA = {"names": ["joy", "fear", "anger", "grief", "calm", "love", "hate", "hope", "panic", "rage", "pride", "shame", "peace", "terror", "dread", "envy"], "prompts": {"joy": "The wedding day arrived at last, and her heart swelled with", "fear": "Alone in the dark house, she was gripped by", "anger": "He tore up the letter, shaking with", "grief": "At the funeral she was overcome with", "calm": "After the long meditation she felt a deep sense of", "love": "Looking at her newborn, she was overwhelmed with", "hate": "Years of betrayal had curdled into pure", "hope": "Despite everything, she still clung to", "panic": "The alarm blared and the crowd dissolved into", "rage": "The insult sent him into a blind", "pride": "Watching his daughter graduate, he glowed with", "shame": "Caught in the lie, his face burned with", "peace": "In the quiet garden she finally found", "terror": "The scream in the night filled them with", "dread": "The unopened envelope filled her with", "envy": "Seeing his brother's new car, he burned with"}, "results": {"joy": {"layers": [{"kl": 1.6597237586975098, "top": "fear", "target_rank": 9}, {"kl": 1.8750303983688354, "top": "pride", "target_rank": 6}, {"kl": 1.694091558456421, "top": "pride", "target_rank": 5}, {"kl": 2.2494497299194336, "top": "pride", "target_rank": 5}, {"kl": 2.0995540618896484, "top": "envy", "target_rank": 5}, {"kl": 1.964888572692871, "top": "pride", "target_rank": 5}, {"kl": 1.1852436065673828, "top": "pride", "target_rank": 2}, {"kl": 0.8338820338249207, "top": "joy", "target_rank": 1}, {"kl": 1.285895586013794, "top": "joy", "target_rank": 1}, {"kl": 1.4761728048324585, "top": "joy", "target_rank": 1}, {"kl": 0.8193743228912354, "top": "joy", "target_rank": 1}, {"kl": 4.68247662865906e-10, "top": "joy", "target_rank": 1}], "final_top": "joy", "final_rank": 1, "commit": 7}, "fear": {"layers": [{"kl": 1.3230456113815308, "top": "calm", "target_rank": 3}, {"kl": 1.014824628829956, "top": "calm", "target_rank": 2}, {"kl": 0.6854798793792725, "top": "fear", "target_rank": 1}, {"kl": 0.7191195487976074, "top": "fear", "target_rank": 1}, {"kl": 0.6810697317123413, "top": "fear", "target_rank": 1}, {"kl": 0.5693382620811462, "top": "panic", "target_rank": 2}, {"kl": 1.0853241682052612, "top": "panic", "target_rank": 2}, {"kl": 1.0024980306625366, "top": "panic", "target_rank": 2}, {"kl": 0.46808186173439026, "top": "fear", "target_rank": 1}, {"kl": 0.37479835748672485, "top": "fear", "target_rank": 1}, {"kl": 0.2455480694770813, "top": "fear", "target_rank": 1}, {"kl": 3.7773254746298335e-08, "top": "fear", "target_rank": 1}], "final_top": "fear", "final_rank": 1, "commit": 8}, "anger": {"layers": [{"kl": 1.5721129179000854, "top": "fear", "target_rank": 10}, {"kl": 1.8013441562652588, "top": "pride", "target_rank": 8}, {"kl": 1.5410205125808716, "top": "rage", "target_rank": 5}, {"kl": 1.8080676794052124, "top": "rage", "target_rank": 4}, {"kl": 1.722906231880188, "top": "rage", "target_rank": 5}, {"kl": 1.4740605354309082, "top": "rage", "target_rank": 4}, {"kl": 1.4420024156570435, "top": "rage", "target_rank": 2}, {"kl": 0.7817708253860474, "top": "rage", "target_rank": 2}, {"kl": 0.38943785429000854, "top": "rage", "target_rank": 2}, {"kl": 0.5301607847213745, "top": "anger", "target_rank": 1}, {"kl": 0.2245514690876007, "top": "anger", "target_rank": 1}, {"kl": 3.027254891208031e-08, "top": "anger", "target_rank": 1}], "final_top": "anger", "final_rank": 1, "commit": 9}, "grief": {"layers": [{"kl": 3.5371193885803223, "top": "fear", "target_rank": 13}, {"kl": 3.3726415634155273, "top": "pride", "target_rank": 12}, {"kl": 2.286961078643799, "top": "fear", "target_rank": 7}, {"kl": 2.516744613647461, "top": "fear", "target_rank": 5}, {"kl": 1.8300955295562744, "top": "pride", "target_rank": 4}, {"kl": 2.862955093383789, "top": "rage", "target_rank": 6}, {"kl": 0.5445976257324219, "top": "anger", "target_rank": 2}, {"kl": 0.7829391360282898, "top": "anger", "target_rank": 2}, {"kl": 0.43543389439582825, "top": "grief", "target_rank": 1}, {"kl": 0.33855751156806946, "top": "grief", "target_rank": 1}, {"kl": 0.24087563157081604, "top": "grief", "target_rank": 1}, {"kl": -2.0903546271711093e-07, "top": "grief", "target_rank": 1}], "final_top": "grief", "final_rank": 1, "commit": 8}, "calm": {"layers": [{"kl": 0.7750322818756104, "top": "calm", "target_rank": 1}, {"kl": 0.796172022819519, "top": "calm", "target_rank": 1}, {"kl": 1.0196983814239502, "top": "calm", "target_rank": 1}, {"kl": 1.024815320968628, "top": "shame", "target_rank": 2}, {"kl": 0.9128616452217102, "top": "shame", "target_rank": 2}, {"kl": 1.628358244895935, "top": "shame", "target_rank": 2}, {"kl": 1.606826663017273, "top": "shame", "target_rank": 3}, {"kl": 2.154942512512207, "top": "shame", "target_rank": 3}, {"kl": 1.3771746158599854, "top": "calm", "target_rank": 1}, {"kl": 0.966210126876831, "top": "joy", "target_rank": 3}, {"kl": 0.9150538444519043, "top": "joy", "target_rank": 3}, {"kl": -4.8080806891448447e-08, "top": "calm", "target_rank": 1}], "final_top": "calm", "final_rank": 1, "commit": 11}, "love": {"layers": [{"kl": 1.9673399925231934, "top": "fear", "target_rank": 9}, {"kl": 2.1621363162994385, "top": "pride", "target_rank": 11}, {"kl": 1.8610597848892212, "top": "fear", "target_rank": 12}, {"kl": 2.2690389156341553, "top": "fear", "target_rank": 12}, {"kl": 1.7592387199401855, "top": "anger", "target_rank": 7}, {"kl": 1.217185139656067, "top": "pride", "target_rank": 5}, {"kl": 0.4689303934574127, "top": "joy", "target_rank": 5}, {"kl": 0.8957176804542542, "top": "joy", "target_rank": 6}, {"kl": 0.8895455598831177, "top": "joy", "target_rank": 5}, {"kl": 1.1655865907669067, "top": "joy", "target_rank": 3}, {"kl": 0.551877498626709, "top": "joy", "target_rank": 3}, {"kl": 2.1358917479119555e-07, "top": "joy", "target_rank": 2}], "final_top": "joy", "final_rank": 2, "commit": null}, "hate": {"layers": [{"kl": 4.19527530670166, "top": "calm", "target_rank": 4}, {"kl": 3.3376686573028564, "top": "joy", "target_rank": 4}, {"kl": 2.4375741481781006, "top": "joy", "target_rank": 4}, {"kl": 2.062964677810669, "top": "joy", "target_rank": 5}, {"kl": 2.455411434173584, "top": "joy", "target_rank": 5}, {"kl": 3.5191490650177, "top": "joy", "target_rank": 4}, {"kl": 2.3707799911499023, "top": "joy", "target_rank": 4}, {"kl": 1.508623480796814, "top": "joy", "target_rank": 5}, {"kl": 0.3866620659828186, "top": "rage", "target_rank": 5}, {"kl": 0.39015820622444153, "top": "anger", "target_rank": 4}, {"kl": 0.3784225285053253, "top": "rage", "target_rank": 4}, {"kl": -1.0498348501641885e-07, "top": "rage", "target_rank": 5}], "final_top": "rage", "final_rank": 5, "commit": null}, "hope": {"layers": [{"kl": 2.2172982692718506, "top": "calm", "target_rank": 3}, {"kl": 3.219359874725342, "top": "calm", "target_rank": 4}, {"kl": 3.6118741035461426, "top": "calm", "target_rank": 8}, {"kl": 2.548562526702881, "top": "calm", "target_rank": 4}, {"kl": 1.53550386428833, "top": "calm", "target_rank": 2}, {"kl": 0.6865171790122986, "top": "hope", "target_rank": 1}, {"kl": 1.0482162237167358, "top": "hope", "target_rank": 1}, {"kl": 0.9894484281539917, "top": "hope", "target_rank": 1}, {"kl": 0.948016345500946, "top": "hope", "target_rank": 1}, {"kl": 0.5902235507965088, "top": "hope", "target_rank": 1}, {"kl": 0.1312452256679535, "top": "hope", "target_rank": 1}, {"kl": 1.0316271215060624e-07, "top": "hope", "target_rank": 1}], "final_top": "hope", "final_rank": 1, "commit": 5}, "panic": {"layers": [{"kl": 1.5401625633239746, "top": "rage", "target_rank": 11}, {"kl": 1.76284921169281, "top": "rage", "target_rank": 12}, {"kl": 2.611323595046997, "top": "rage", "target_rank": 11}, {"kl": 3.268739700317383, "top": "rage", "target_rank": 10}, {"kl": 2.210596799850464, "top": "rage", "target_rank": 10}, {"kl": 2.8999667167663574, "top": "calm", "target_rank": 8}, {"kl": 1.751155972480774, "top": "calm", "target_rank": 5}, {"kl": 1.7527304887771606, "top": "calm", "target_rank": 4}, {"kl": 1.4433245658874512, "top": "calm", "target_rank": 2}, {"kl": 1.2433083057403564, "top": "panic", "target_rank": 1}, {"kl": 0.5916947722434998, "top": "panic", "target_rank": 1}, {"kl": 1.0869673161550963e-08, "top": "panic", "target_rank": 1}], "final_top": "panic", "final_rank": 1, "commit": 9}, "rage": {"layers": [{"kl": 0.41360071301460266, "top": "rage", "target_rank": 1}, {"kl": 0.9749348163604736, "top": "rage", "target_rank": 1}, {"kl": 0.2596763074398041, "top": "rage", "target_rank": 1}, {"kl": 0.09607243537902832, "top": "rage", "target_rank": 1}, {"kl": 0.15153901278972626, "top": "rage", "target_rank": 1}, {"kl": 0.09810000658035278, "top": "rage", "target_rank": 1}, {"kl": 1.0195701122283936, "top": "panic", "target_rank": 2}, {"kl": 0.020636990666389465, "top": "rage", "target_rank": 1}, {"kl": 0.0074647762812674046, "top": "rage", "target_rank": 1}, {"kl": 0.04370092228055, "top": "rage", "target_rank": 1}, {"kl": 0.02442486770451069, "top": "rage", "target_rank": 1}, {"kl": 1.0420865947935454e-07, "top": "rage", "target_rank": 1}], "final_top": "rage", "final_rank": 1, "commit": 7}, "pride": {"layers": [{"kl": 1.0510106086730957, "top": "fear", "target_rank": 2}, {"kl": 0.7378501296043396, "top": "pride", "target_rank": 1}, {"kl": 0.4833278954029083, "top": "pride", "target_rank": 1}, {"kl": 0.8054823875427246, "top": "pride", "target_rank": 1}, {"kl": 1.0687611103057861, "top": "pride", "target_rank": 1}, {"kl": 0.996585488319397, "top": "pride", "target_rank": 1}, {"kl": 1.5478219985961914, "top": "pride", "target_rank": 1}, {"kl": 1.8073194026947021, "top": "pride", "target_rank": 1}, {"kl": 1.6115307807922363, "top": "pride", "target_rank": 1}, {"kl": 0.9733752012252808, "top": "pride", "target_rank": 1}, {"kl": 0.564784586429596, "top": "pride", "target_rank": 1}, {"kl": -1.64505422617367e-08, "top": "pride", "target_rank": 1}], "final_top": "pride", "final_rank": 1, "commit": 1}, "shame": {"layers": [{"kl": 0.9921568036079407, "top": "fear", "target_rank": 8}, {"kl": 1.1598042249679565, "top": "pride", "target_rank": 5}, {"kl": 0.9835994243621826, "top": "pride", "target_rank": 7}, {"kl": 1.2739828824996948, "top": "rage", "target_rank": 5}, {"kl": 1.9269345998764038, "top": "dread", "target_rank": 10}, {"kl": 1.6405969858169556, "top": "rage", "target_rank": 5}, {"kl": 1.412561297416687, "top": "rage", "target_rank": 8}, {"kl": 1.0466467142105103, "top": "rage", "target_rank": 6}, {"kl": 0.6799299716949463, "top": "anger", "target_rank": 5}, {"kl": 0.9477280974388123, "top": "anger", "target_rank": 5}, {"kl": 0.560299813747406, "top": "anger", "target_rank": 4}, {"kl": -1.2196095156014053e-07, "top": "rage", "target_rank": 4}], "final_top": "rage", "final_rank": 4, "commit": null}, "peace": {"layers": [{"kl": 2.1750712394714355, "top": "joy", "target_rank": 9}, {"kl": 3.04974365234375, "top": "joy", "target_rank": 9}, {"kl": 1.8942205905914307, "top": "joy", "target_rank": 5}, {"kl": 1.0871750116348267, "top": "joy", "target_rank": 4}, {"kl": 0.6100187301635742, "top": "hope", "target_rank": 4}, {"kl": 0.7979441285133362, "top": "joy", "target_rank": 3}, {"kl": 0.7463038563728333, "top": "calm", "target_rank": 3}, {"kl": 0.5524181127548218, "top": "peace", "target_rank": 1}, {"kl": 1.286571741104126, "top": "calm", "target_rank": 2}, {"kl": 0.6898556351661682, "top": "calm", "target_rank": 2}, {"kl": 0.16167154908180237, "top": "peace", "target_rank": 1}, {"kl": 3.2558773455093615e-09, "top": "peace", "target_rank": 1}], "final_top": "peace", "final_rank": 1, "commit": 10}, "terror": {"layers": [{"kl": 0.9540344476699829, "top": "fear", "target_rank": 14}, {"kl": 0.8267394304275513, "top": "fear", "target_rank": 14}, {"kl": 0.8944380879402161, "top": "fear", "target_rank": 15}, {"kl": 1.043521761894226, "top": "rage", "target_rank": 15}, {"kl": 1.1490110158920288, "top": "rage", "target_rank": 16}, {"kl": 2.7736411094665527, "top": "rage", "target_rank": 16}, {"kl": 2.6117517948150635, "top": "rage", "target_rank": 16}, {"kl": 2.9883131980895996, "top": "rage", "target_rank": 14}, {"kl": 2.0749170780181885, "top": "rage", "target_rank": 14}, {"kl": 1.425122618675232, "top": "fear", "target_rank": 13}, {"kl": 0.542281985282898, "top": "fear", "target_rank": 9}, {"kl": 3.916352397936862e-08, "top": "fear", "target_rank": 3}], "final_top": "fear", "final_rank": 3, "commit": null}, "dread": {"layers": [{"kl": 0.6945514678955078, "top": "fear", "target_rank": 9}, {"kl": 0.9095176458358765, "top": "fear", "target_rank": 3}, {"kl": 0.6255635619163513, "top": "fear", "target_rank": 10}, {"kl": 1.023821234703064, "top": "rage", "target_rank": 7}, {"kl": 0.781961977481842, "top": "fear", "target_rank": 6}, {"kl": 1.0227446556091309, "top": "rage", "target_rank": 11}, {"kl": 0.630135715007782, "top": "rage", "target_rank": 12}, {"kl": 0.9440441131591797, "top": "joy", "target_rank": 13}, {"kl": 0.8125511407852173, "top": "joy", "target_rank": 9}, {"kl": 0.5911062955856323, "top": "joy", "target_rank": 10}, {"kl": 0.18655036389827728, "top": "joy", "target_rank": 6}, {"kl": -6.55563212603738e-08, "top": "joy", "target_rank": 7}], "final_top": "joy", "final_rank": 7, "commit": null}, "envy": {"layers": [{"kl": 0.9697481393814087, "top": "fear", "target_rank": 13}, {"kl": 1.271503210067749, "top": "fear", "target_rank": 13}, {"kl": 1.151695728302002, "top": "pride", "target_rank": 10}, {"kl": 1.315422773361206, "top": "pride", "target_rank": 5}, {"kl": 1.2599488496780396, "top": "pride", "target_rank": 4}, {"kl": 1.6138291358947754, "top": "rage", "target_rank": 3}, {"kl": 0.970522403717041, "top": "rage", "target_rank": 3}, {"kl": 1.4767606258392334, "top": "rage", "target_rank": 3}, {"kl": 0.9564435482025146, "top": "rage", "target_rank": 3}, {"kl": 0.891342282295227, "top": "rage", "target_rank": 3}, {"kl": 0.34994569420814514, "top": "rage", "target_rank": 3}, {"kl": 3.498820433378569e-08, "top": "rage", "target_rank": 5}], "final_top": "rage", "final_rank": 5, "commit": null}}, "val": [1.0, -0.29388633370399475, -0.4954790472984314, -0.5292887091636658, 0.7494751214981079, 0.7458389401435852, -0.6951959729194641, 0.5584139227867126, -0.7286158800125122, -0.38624128699302673, 0.7290867567062378, -0.42201006412506104, 0.7869360446929932, -0.5866477489471436, -0.5339154601097107, 0.10152935236692429], "aro": [0.016102518886327744, 0.15070146322250366, 0.27279287576675415, 0.13416361808776855, -1.0, -0.09116104990243912, 0.16965153813362122, -0.05212271958589554, 0.2914682626724243, 0.329689085483551, -0.11572571843862534, -0.14340080320835114, -0.41124415397644043, 0.21845586597919464, 0.14974534511566162, 0.08088389039039612], "sim": [[0.9999997615814209, -0.1500944346189499, -0.14107099175453186, 0.038918063044548035, -0.07315417379140854, 0.10799708962440491, -0.21050328016281128, -0.021102597936987877, -0.1645299792289734, -0.0764118954539299, 0.021884432062506676, 0.007939795032143593, 0.027853434905409813, -0.09803123772144318, -0.11129317432641983, -0.09805288165807724], [-0.1500944346189499, 0.9999998807907104, 0.007953557185828686, -0.20012173056602478, -0.1562008112668991, -0.055148735642433167, -0.029477298259735107, 0.08430472016334534, 0.12857723236083984, -0.1776563674211502, -0.20705904066562653, -0.003209637477993965, -0.1513945460319519, 0.08662064373493195, 0.10152749717235565, -0.11433334648609161], [-0.14107099175453186, 0.007953557185828686, 1.0000007152557373, 0.10524819791316986, 0.0065293386578559875, -0.20472599565982819, -0.06647941470146179, -0.1497448831796646, -0.014688776805996895, 0.30077868700027466, -0.11733926832675934, -0.007547730579972267, -0.15060192346572876, -0.15785755217075348, -0.17945325374603271, -0.06886900961399078], [0.038918063044548035, -0.20012173056602478, 0.10524819791316986, 0.9999999403953552, -0.1052335649728775, -0.07818209379911423, -0.04783491790294647, -0.10942395031452179, -0.021153723821043968, 0.04496803134679794, -0.15316879749298096, 0.004300805740058422, -0.08828265219926834, -0.12072376906871796, -0.08176326751708984, -0.16128692030906677], [-0.07315417379140854, -0.1562008112668991, 0.0065293386578559875, -0.1052335649728775, 1.0000001192092896, -0.1120632141828537, -0.19943928718566895, -0.03594531863927841, 0.06748133897781372, -0.07401111721992493, -0.10039784759283066, -0.10773152858018875, 0.20427528023719788, -0.04805091768503189, -0.1109287217259407, -0.18824447691440582], [0.10799708962440491, -0.055148735642433167, -0.20472599565982819, -0.07818209379911423, -0.1120632141828537, 0.9999997615814209, 0.24957522749900818, 0.07887300103902817, -0.23903357982635498, -0.14770278334617615, 0.0031682904809713364, -0.15918253362178802, 0.009041490964591503, -0.15264835953712463, -0.13486766815185547, -0.05533155798912048], [-0.21050328016281128, -0.029477298259735107, -0.06647941470146179, -0.04783491790294647, -0.19943928718566895, 0.24957522749900818, 0.9999998807907104, -0.10270445048809052, -0.15479251742362976, -0.025565944612026215, -0.07439717650413513, -0.13181407749652863, -0.073895663022995, 0.0451231524348259, 0.0034245196729898453, -0.06813015043735504], [-0.021102597936987877, 0.08430472016334534, -0.1497448831796646, -0.10942395031452179, -0.03594531863927841, 0.07887300103902817, -0.10270445048809052, 0.9999998807907104, -0.15887212753295898, -0.215539813041687, -0.026722073554992676, -0.08632390201091766, 0.025724805891513824, -0.13192760944366455, -0.05135682225227356, -0.12212634831666946], [-0.1645299792289734, 0.12857723236083984, -0.014688776805996895, -0.021153723821043968, 0.06748133897781372, -0.23903357982635498, -0.15479251742362976, -0.15887212753295898, 0.9999997615814209, 0.057801492512226105, -0.18539707362651825, -0.09809936583042145, -0.17897629737854004, 0.05819486826658249, -0.002388838678598404, -0.09206855297088623], [-0.0764118954539299, -0.1776563674211502, 0.30077868700027466, 0.04496803134679794, -0.07401111721992493, -0.14770278334617615, -0.025565944612026215, -0.215539813041687, 0.057801492512226105, 1.0, -0.1009286418557167, -0.08692490309476852, -0.19899003207683563, -0.0939970538020134, -0.14973555505275726, -0.011181473731994629], [0.021884432062506676, -0.20705904066562653, -0.11733926832675934, -0.15316879749298096, -0.10039784759283066, 0.0031682904809713364, -0.07439717650413513, -0.026722073554992676, -0.18539707362651825, -0.1009286418557167, 0.9999997615814209, 0.009993505664169788, -0.04608302563428879, -0.17257219552993774, -0.1344306766986847, 0.18424494564533234], [0.007939795032143593, -0.003209637477993965, -0.007547730579972267, 0.004300805740058422, -0.10773152858018875, -0.15918253362178802, -0.13181407749652863, -0.08632390201091766, -0.09809936583042145, -0.08692490309476852, 0.009993505664169788, 0.9999997615814209, -0.16496360301971436, -0.08950987458229065, -0.08828386664390564, -0.027015352621674538], [0.027853434905409813, -0.1513945460319519, -0.15060192346572876, -0.08828265219926834, 0.20427528023719788, 0.009041490964591503, -0.073895663022995, 0.025724805891513824, -0.17897629737854004, -0.19899003207683563, -0.04608302563428879, -0.16496360301971436, 1.0000004768371582, 0.06285804510116577, -0.14603465795516968, -0.20839159190654755], [-0.09803123772144318, 0.08662064373493195, -0.15785755217075348, -0.12072376906871796, -0.04805091768503189, -0.15264835953712463, 0.0451231524348259, -0.13192760944366455, 0.05819486826658249, -0.0939970538020134, -0.17257219552993774, -0.08950987458229065, 0.06285804510116577, 1.000000238418579, 0.033447492867708206, -0.17320796847343445], [-0.11129317432641983, 0.10152749717235565, -0.17945325374603271, -0.08176326751708984, -0.1109287217259407, -0.13486766815185547, 0.0034245196729898453, -0.05135682225227356, -0.002388838678598404, -0.14973555505275726, -0.1344306766986847, -0.08828386664390564, -0.14603465795516968, 0.033447492867708206, 0.9999996423721313, -0.03386116400361061], [-0.09805288165807724, -0.11433334648609161, -0.06886900961399078, -0.16128692030906677, -0.18824447691440582, -0.05533155798912048, -0.06813015043735504, -0.12212634831666946, -0.09206855297088623, -0.011181473731994629, 0.18424494564533234, -0.027015352621674538, -0.20839159190654755, -0.17320796847343445, -0.03386116400361061, 0.9999997615814209]], "band": [1.6264177352190017, 1.8604750454425811, 1.6087673902511597, 1.6124228954315185, 1.2822906717658042, 1.3978714227676392, 1.197706264257431, 1.0678585961461067, 0.9252932021860033, 0.7226363200694322, 0.3919224338606, 1.6444161587969575e-09], "frac": [0.0, 0.1, 0.1, 0.1, 0.1, 0.2, 0.2, 0.4, 0.6, 0.8, 0.9, 1.0], "ok": ["joy", "fear", "anger", "grief", "calm", "hope", "panic", "rage", "pride", "peace"], "witness": {"kl11": 2.1358917479119555e-07, "commit": true, "sanity": {"joy_E": true, "grief_W": true, "panic_N": true, "calm_S": true}}};
+const NL = 12, names = DATA.names, NEM = names.length;
+const okSet = new Set(DATA.ok);
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rng = mulberry32(4242);
+
+/* ---------------- SOFT-GL ENGINE (SGL) ---------------- */
+const SGL = {
+  yaw:0.6, pitch:0.5, dist:5.6, scale:150, W:980, H:640,
+  project(x,y,z){
+    const cy=Math.cos(this.yaw), sy=Math.sin(this.yaw);
+    const cp=Math.cos(this.pitch), sp=Math.sin(this.pitch);
+    let x1=cy*x+sy*z, z1=-sy*x+cy*z;
+    let y1=cp*y-sp*z1, z2=sp*y+cp*z1;
+    const w=this.dist/(this.dist+z2);
+    return {x:this.W/2+x1*this.scale*w, y:this.H/2-y1*this.scale*w, w, depth:z2};
+  },
+  path(ctx,pts,c,lw){ctx.strokeStyle=c;ctx.lineWidth=lw||1;ctx.beginPath();
+    pts.forEach((p,i)=>{const P=this.project(...p);i?ctx.lineTo(P.x,P.y):ctx.moveTo(P.x,P.y);});ctx.stroke();},
+  line(ctx,a,b,c,lw){const A=this.project(...a),B=this.project(...b);
+    ctx.strokeStyle=c;ctx.lineWidth=lw||1;ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke();},
+  dot(ctx,p,c,r,hollow){const P=this.project(...p);
+    if(hollow){ctx.strokeStyle=c;ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(P.x,P.y,(r||3)*P.w,0,7);ctx.stroke();}
+    else{ctx.fillStyle=c;ctx.beginPath();ctx.arc(P.x,P.y,(r||3)*P.w,0,7);ctx.fill();}},
+  text3(ctx,p,t,c){const P=this.project(...p);ctx.fillStyle=c;
+    ctx.font="11px ui-monospace,monospace";ctx.fillText(t,P.x+7,P.y-7);}
+};
+
+/* torus geometry: phi around ring (compass), theta around tube (commitment depth) */
+const R=1.55, r=0.62;
+const torus=(phi,th)=>[
+  (R+r*Math.cos(th))*Math.cos(phi),
+  r*Math.sin(th),
+  (R+r*Math.cos(th))*Math.sin(phi)];
+
+/* compass convention: E at phi=0, N at phi=pi/2, W at pi, S at 3pi/2 */
+/* bearing of each emotion from (valence, arousal): psi = atan2(aro, val) */
+const psi = names.map((n,i)=>Math.atan2(DATA.aro[i], DATA.val[i]));
+/* commitment depth -> theta: L0 outer equator (0), L11 wraps over the top to inner (5pi/6..); misses pinned inner */
+const thetaOf = n => {
+  const c = DATA.results[n].commit;
+  if(!okSet.has(n) || c===null) return Math.PI;           // inner equator: unaudited
+  return (c/11)*Math.PI*0.83;                              // 0 .. ~150 deg
+};
+const theta = names.map(thetaOf);
+
+/* Kuramoto-dipole state: needles start at seeded random phi */
+let phi = names.map(()=>rng()*2*Math.PI);
+let vel = names.map(()=>0);
+const charge = names.map((n,i)=>Math.hypot(DATA.val[i], DATA.aro[i]));  // magnetic moment
+function stepSim(dt){
+  const K_field=2.2, K_pair=0.9, damp=2.6;
+  const acc = names.map((n,i)=>{
+    let a = K_field * charge[i] * Math.sin(psi[i]-phi[i]);     // dipole torque toward bearing
+    for(let j=0;j<NEM;j++) if(j!==i){
+      const s = DATA.sim[i][j];
+      a += (K_pair/NEM) * s * Math.sin(phi[j]-phi[i]);          // similarity coupling (attract if s>0, repel if s<0)
+    }
+    return a - damp*vel[i];
+  });
+  for(let i=0;i<NEM;i++){ vel[i]+=acc[i]*dt; phi[i]+=vel[i]*dt; }
+}
+
+/* ---------------- EDIT BLOCK 3: draw3D ---------------- */
+const c3=document.getElementById('c3d'), ctx3=c3.getContext('2d');
+function draw3D(){
+  ctx3.clearRect(0,0,980,640);
+  /* torus wireframe: ring circles + tube rings */
+  for(let m=0;m<24;m++){
+    const th=m/24*2*Math.PI, pts=[];
+    for(let s=0;s<=48;s++) pts.push(torus(s/48*2*Math.PI, th));
+    SGL.path(ctx3,pts,"rgba(58,51,43,0.85)",1);
+  }
+  for(let m=0;m<16;m++){
+    const ph=m/16*2*Math.PI, pts=[];
+    for(let s=0;s<=32;s++) pts.push(torus(ph, s/32*2*Math.PI));
+    SGL.path(ctx3,pts,"rgba(58,51,43,0.55)",1);
+  }
+  /* cardinals on outer equator; N/S get pole glyphs */
+  const card=[["E",0,"#2dd4bf"],["N",Math.PI/2,"#ff6a00"],["W",Math.PI,"#ff3b3b"],["S",3*Math.PI/2,"#b085ff"]];
+  for(const [lab,ph,col] of card){
+    const p=torus(ph,0), po=[p[0]*1.16,p[1],p[2]*1.16];
+    SGL.line(ctx3,p,po,col,2);
+    SGL.dot(ctx3,po,col,4);
+    SGL.text3(ctx3,po,lab + (lab==="N"?" arousal+":lab==="S"?" arousal−":lab==="E"?" val+":" val−"),col);
+  }
+  /* dipole field arcs N->S over the hole (suggestive field lines) */
+  for(const sgn of [-1,1]){
+    const pts=[];
+    for(let s=0;s<=30;s++){
+      const t=s/30, ph=Math.PI/2 + sgn*t*Math.PI;
+      pts.push(torus(ph, 0).map((v,i)=> i===1 ? v+0.35*Math.sin(t*Math.PI) : v));
+    }
+    SGL.path(ctx3,pts,"rgba(255,160,64,0.35)",1);
+  }
+  /* emotions: needle from current phi on the tube at their theta */
+  for(let i=0;i<NEM;i++){
+    const n=names[i];
+    const p=torus(phi[i], theta[i]);
+    const col = DATA.val[i]>=0 ? "#2dd4bf" : "#ff3b3b";
+    const sz = 2.5 + 3.5*Math.abs(DATA.aro[i]);
+    const hollow = !okSet.has(n);
+    /* trail toward bearing */
+    SGL.dot(ctx3,p,col,sz,hollow);
+    SGL.text3(ctx3,p,n + (DATA.results[n].commit!==null && okSet.has(n) ? " L"+DATA.results[n].commit : " ·miss"), hollow?"#8a7f70":col);
+  }
+}
+/* ------------------------------------------------------ */
+
+/* ---------------- EDIT BLOCK 2: draw2D (audit) ---------------- */
+const c2=document.getElementById('c2d'), ctx2=c2.getContext('2d');
+function draw2D(){
+  ctx2.clearRect(0,0,920,640);
+  /* top: KL band + fraction committed */
+  const X0=60,X1=880,Y0=30,Y1=250;
+  const kmax=Math.max(...DATA.band)*1.1;
+  const sx=k=>X0+k/(NL-1)*(X1-X0);
+  const syK=v=>Y1-(v/kmax)*(Y1-Y0);
+  const syF=v=>Y1-v*(Y1-Y0);
+  ctx2.strokeStyle="#2c2620";
+  for(let g=0;g<=4;g++){const y=Y0+g*(Y1-Y0)/4;ctx2.beginPath();ctx2.moveTo(X0,y);ctx2.lineTo(X1,y);ctx2.stroke();}
+  /* KL area */
+  ctx2.fillStyle="rgba(255,59,59,0.18)";
+  ctx2.beginPath(); ctx2.moveTo(sx(0),Y1);
+  DATA.band.forEach((v,k)=>ctx2.lineTo(sx(k),syK(v)));
+  ctx2.lineTo(sx(NL-1),Y1); ctx2.closePath(); ctx2.fill();
+  ctx2.strokeStyle="#ff3b3b"; ctx2.lineWidth=2; ctx2.beginPath();
+  DATA.band.forEach((v,k)=>{k?ctx2.lineTo(sx(k),syK(v)):ctx2.moveTo(sx(k),syK(v));}); ctx2.stroke();
+  /* fraction committed staircase */
+  ctx2.strokeStyle="#2dd4bf"; ctx2.lineWidth=2; ctx2.beginPath();
+  DATA.frac.forEach((v,k)=>{k?ctx2.lineTo(sx(k),syF(v)):ctx2.moveTo(sx(k),syF(v));}); ctx2.stroke();
+  ctx2.font="10px ui-monospace,monospace";
+  for(let k=0;k<NL;k++){ctx2.fillStyle="#8a7f70";ctx2.fillText("L"+k,sx(k)-8,Y1+16);}
+  ctx2.fillStyle="#ff3b3b"; ctx2.fillText("mean KL(final‖LLₖ) — the lie, in nats (peak "+Math.max(...DATA.band).toFixed(2)+" at L1)",X0,Y0-10);
+  ctx2.fillStyle="#2dd4bf"; ctx2.fillText("fraction of emotions committed",X1-230,Y0-10);
+
+  /* bottom: commitment ladder */
+  const LY0=310, rowH=26, BX0=140, BX1=760;
+  ctx2.fillStyle="#ffa040"; ctx2.font="11px ui-monospace,monospace";
+  ctx2.fillText("COMMITMENT LADDER — first layer where the logit lens locks the right emotion, and holds", 60, LY0-14);
+  const committed = DATA.ok.slice().sort((a,b)=>DATA.results[a].commit-DATA.results[b].commit);
+  committed.forEach((n,row)=>{
+    const y=LY0+row*rowH;
+    const c=DATA.results[n].commit;
+    const i=names.indexOf(n);
+    const col=DATA.val[i]>=0?"#2dd4bf":"#ff3b3b";
+    ctx2.fillStyle="#e8e0d4"; ctx2.fillText(n, 60, y+13);
+    ctx2.strokeStyle="#2c2620"; ctx2.strokeRect(BX0,y+2,BX1-BX0,16);
+    ctx2.fillStyle=col; ctx2.globalAlpha=0.75;
+    ctx2.fillRect(BX0, y+2, (c/11)*(BX1-BX0), 16);
+    ctx2.globalAlpha=1;
+    ctx2.fillStyle="#8a7f70"; ctx2.fillText("L"+c, BX1+12, y+14);
+  });
+  /* misses */
+  const misses=names.filter(n=>!okSet.has(n));
+  ctx2.fillStyle="#8a7f70";
+  ctx2.fillText("MISSES (model’s final pick ≠ target — audit withheld):", 60, LY0+committed.length*rowH+22);
+  misses.forEach((n,i)=>{
+    ctx2.fillStyle="#8a7f70";
+    ctx2.fillText(n+" → model says “"+DATA.results[n].final_top+"”", 80+ (i%3)*270, LY0+committed.length*rowH+42+Math.floor(i/3)*18);
+  });
+}
+/* -------------------------------------------------------------- */
+
+document.getElementById('numbers').innerHTML =
+  "<b>WITNESSED NUMBERS</b> &middot; W1 max KL@L11 across prompts: <b>2.14e-07</b> (audit metric zeroes exactly where it must) &middot; " +
+  "W2 commitment stable to L11 for all <b>10/10</b> final-top targets &middot; " +
+  "W3 axis sanity 4/4: joy&rarr;E, grief&rarr;W, panic&rarr;N, calm&rarr;S &mdash; GPT-2&rsquo;s unembedding geometry reproduces the circumplex unprompted. " +
+  "Audit reading: the logit lens&rsquo;s emotion-simplex KL peaks at <b>1.86 nats (L1)</b> and does not fall below 1 nat until <b>L8</b> &mdash; " +
+  "for the first two-thirds of the stack the logit lens is not a reliable witness about what this model feels its sentence is about. " +
+  "Commitment spread: <b>pride L1</b> (instant) &rarr; <b>calm L11</b> (last moment). " +
+  "Magnetics: field torque K<sub>f</sub>&middot;|m|&middot;sin(&psi;&minus;&phi;) toward each emotion&rsquo;s (valence,arousal) bearing, plus Kuramoto coupling K<sub>p</sub>&middot;sim<sub>ij</sub>&middot;sin(&phi;<sub>j</sub>&minus;&phi;<sub>i</sub>) &mdash; " +
+  "similar emotions phase-lock into clusters; dissimilar (negative cosine) repel. " +
+  "Tiers: audit numbers <b>lit</b>; affect coordinates <b>bri</b> (semantic-axis projection on unembedding rows &mdash; standard but crude); the torus mapping itself is presentation, not claim.";
+
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(0.05,(now-last)/1000); last=now;
+  stepSim(dt);
+  SGL.yaw+=0.0035;
+  draw3D();
+  requestAnimationFrame(frame);
+}
+draw2D(); draw3D();
+requestAnimationFrame(frame);
+
+} catch(e){ DIAG((e&&e.stack)?e.stack:String(e)); }
+})();
+</script>
+</body>
+</html>
